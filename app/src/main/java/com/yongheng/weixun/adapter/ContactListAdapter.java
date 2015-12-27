@@ -23,7 +23,7 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
     private String mSections = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private ArrayList<ContactsInfo> mContactsInfoList;
     Context mContext;
-s
+
     public ContactListAdapter(Context context) {
         mContext = context;
     }
