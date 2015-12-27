@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">微讯</string>
+    <string name="btn_title_add">添加</string>
+    <string name="chat_send_fail_hint">发送失败</string>
+    <string name="main_login_fail_hint">登录失败</string>
+    <string name="main_login_success_hint">登录成功</string>
+    <string name="main_offline_hint">已退出登录</string>
+    <string name="main_tab_conversation">消息</string>
+    <string name="main_tab_contacts">联系人</string>
+    <string name="main_tab_find">发现</string>
+    <string name="login_input_account_hint">请输入账号</string>
+    <string name="login_input_pwd_hint">请输入密码</string>
+    <string name="login_pwd_error_hint">密码不正确</string>
+    <string name="login_signin_hint">该用户尚未注册</string>
+    <string name="action_settings">设置</string>
+
+</resources>
