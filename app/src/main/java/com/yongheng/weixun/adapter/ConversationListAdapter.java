@@ -55,26 +55,35 @@ public class ConversationListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHold viewHold;
         if (convertView == null) {
-            convertView = View.inflate(mContext, R.layout.widget_list_item_conversation, null);
+            convertView = View.inflate(mContext, R.layout.list_item_conversation, null);
             viewHold = new ViewHold();
-            viewHold.icon = (ImageView) convertView.findViewById(R.id.iv_conversation_icon);
             viewHold.title = (TextView) convertView.findViewById(R.id.tv_conversation_title);
             viewHold.msg = (TextView) convertView.findViewById(R.id.tv_conversation_msg);
+            viewHold.ic = (ImageView) convertView.findViewById(R.id.iv_conversation_ic);
             convertView.setTag(viewHold);
 
         } else {
             viewHold = (ViewHold) convertView.getTag();
         }
 
-        viewHold.icon.setImageResource(R.mipmap.ic_launcher);
         viewHold.title.setText(mConversationList.get(position).contactsName);
         viewHold.msg.setText(mConversationList.get(position).lastMsg);
+        switch (mConversationList.get(position).contactsSex) {
+            case "female":
+                viewHold.ic.setImageResource(R.mipmap.user_female_ic);
+                break;
+            case "male":
+                viewHold.ic.setImageResource(R.mipmap.user_male_ic);
+                break;
+            default:
+                viewHold.ic.setImageResource(R.mipmap.user_male_ic);
+        }
 
         return convertView;
     }
 
     class ViewHold {
-        public ImageView icon;
+        public ImageView ic;
         public TextView title;
         public TextView msg;
     }

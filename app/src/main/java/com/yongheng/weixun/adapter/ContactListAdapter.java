@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
@@ -41,11 +42,13 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
             for (int j = 0; j < getCount(); j++) {
                 if (i == 0) {
                     for (int k = 0; k <= 9; k++) {
-                        if (StringMatcher.match(String.valueOf(mContactsInfoList.get(j).name.charAt(0)), String.valueOf(k)))
+                        if (StringMatcher.match(String.valueOf(
+                                mContactsInfoList.get(j).name.charAt(0)), String.valueOf(k)))
                             return j;
                     }
                 } else {
-                    if (StringMatcher.match(String.valueOf(mContactsInfoList.get(j).name.charAt(0)), String.valueOf(mSections.charAt(i))))
+                    if (StringMatcher.match(String.valueOf(
+                            mContactsInfoList.get(j).name.charAt(0)), String.valueOf(mSections.charAt(i))))
                         return j;
                 }
             }
@@ -88,9 +91,10 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHold viewHold;
         if (convertView == null) {
-            convertView = View.inflate(mContext, R.layout.widget_list_item_contact, null);
+            convertView = View.inflate(mContext, R.layout.list_item_contact, null);
             viewHold = new ViewHold();
-            viewHold.name = (TextView) convertView.findViewById(R.id.tv_item_contact_name);
+            viewHold.name = (TextView) convertView.findViewById(R.id.tv_item_contacts_name);
+            viewHold.ic = (ImageView) convertView.findViewById(R.id.iv_contacts_ic);
             convertView.setTag(viewHold);
 
         } else {
@@ -98,11 +102,22 @@ public class ContactListAdapter extends BaseAdapter implements SectionIndexer {
         }
 
         viewHold.name.setText(mContactsInfoList.get(position).name);
+        switch (mContactsInfoList.get(position).sex) {
+            case "female":
+                viewHold.ic.setImageResource(R.mipmap.user_female_ic);
+                break;
+            case "male":
+                viewHold.ic.setImageResource(R.mipmap.user_male_ic);
+                break;
+            default:
+                viewHold.ic.setImageResource(R.mipmap.user_male_ic);
+        }
 
         return convertView;
     }
 
     class ViewHold {
         public TextView name;
+        public ImageView ic;
     }
 }

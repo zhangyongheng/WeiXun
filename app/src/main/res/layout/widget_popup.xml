@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#f44336"
+    android:gravity="center"
+    android:padding="8dp"
+    android:text="@string/menu_delete_contacts"
+    android:textColor="#FAFAFA"
+    android:textSize="14sp" />

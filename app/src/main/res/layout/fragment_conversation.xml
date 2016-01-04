@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/fl_scan_container"
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp">
+
+        <ImageView
+            android:id="@+id/iv_scan_line1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/main_scan_line" />
+
+        <ImageView
+            android:id="@+id/iv_scan_line2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/main_scan_line" />
+
+    </FrameLayout>
+
+    <ListView
+        android:id="@+id/lv_message_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </ListView>
+
+
+</LinearLayout>

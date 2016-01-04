@@ -1,6 +1,7 @@
 package com.yongheng.weixun.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,13 +20,17 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMMessagesQueryCallback;
-import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.yongheng.weixun.Constants;
 import com.yongheng.weixun.R;
 import com.yongheng.weixun.adapter.ChatListAdapter;
+import com.yongheng.weixun.event.MessageEvent;
 import com.yongheng.weixun.model.MessageInfo;
+import com.yongheng.weixun.utils.ToastUtils;
 
 import java.util.Arrays;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by 张永恒 on 2015/12/23.
@@ -34,33 +39,37 @@ import java.util.List;
 public class ChatActivity extends Activity implements View.OnClickListener {
 
 
-    private TextView mTvTitle;
     private ListView mLvChatList;
     private EditText mEtInput;
-    private Button mBtnSend;
     private ChatListAdapter mChatListAdapter;
     public static AVIMClient mMyClient;
-    public static String mMyName;
-    public static String mContactsName;
+    private String mMyAccount;
+    private String mContactsName;
+    private String mContactsAccount;
     private AVIMConversation mConversation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        Intent intent = getIntent();
+        mMyAccount = intent.getStringExtra("MyAccount");
+        mContactsName = intent.getStringExtra("ContactsName");
+        mContactsAccount = intent.getStringExtra("ContactsAccount");
+        EventBus.getDefault().register(this);
+
         initView();
         initData();
 
     }
 
     private void initView() {
-        mTvTitle = (TextView) findViewById(R.id.tv_chat_title);
+        TextView tvTitle = (TextView) findViewById(R.id.tv_chat_title);
+        Button btnSend = (Button) findViewById(R.id.btn_chat_send);
         mLvChatList = (ListView) findViewById(R.id.lv_chat_list);
         mEtInput = (EditText) findViewById(R.id.et_chat_input);
-        mBtnSend = (Button) findViewById(R.id.btn_chat_send);
-
-        mTvTitle.setText(mContactsName);
-        mBtnSend.setOnClickListener(this);
+        tvTitle.setText(mContactsName);
+        btnSend.setOnClickListener(this);
         mChatListAdapter = new ChatListAdapter(this);
         mLvChatList.setAdapter(mChatListAdapter);
 
@@ -71,37 +80,30 @@ public class ChatActivity extends Activity implements View.OnClickListener {
     }
 
     /**
-     * 查询服务器获取与该联系人的会话，将查询到的会话对象赋值给mConversation,如果没有则创建会话
+     * 查询服务器获取与该联系人的会话，将查询到的会话对象赋值给mConversation
      */
     private void initConversation() {
         AVIMConversationQuery query = mMyClient.getQuery();
         //查询条件为成员列表中包含自己和该联系人，m为成员列表的字段
-        query.whereContainsAll("m", Arrays.asList(mContactsName, mMyName));
+        query.whereContainsAll(Constants.FIELD_CONVERSATION_MEMBER, Arrays.asList(mContactsAccount, mMyAccount));
         query.findInBackground(new AVIMConversationQueryCallback() {
             @Override
             public void done(List<AVIMConversation> list, AVIMException e) {
-                if (e == null) {
-                    if (list.size() == 0) {
-                        mMyClient.createConversation(Arrays.asList(mContactsName),
-                                mMyName + "&" + mContactsName, null, new AVIMConversationCreatedCallback() {
-                                    @Override
-                                    public void done(AVIMConversation avimConversation, AVIMException e) {
-                                        mConversation = avimConversation;
-                                    }
-                                });
-                    } else {
-                        mConversation = list.get(0);
-                    }
-                    updateMessageRecord();
-
+                if (e != null) {
+                    ToastUtils.showException(ChatActivity.this);
+                    return;
                 }
+                if (list.size() > 0) {
+                    mConversation = list.get(0);
+                }
+                updateMessageRecord();
             }
         });
 
     }
 
     /**
-     * 从服务器查询最近十条的消息，更新消息记录
+     * 从服务器查询最近10条的消息，更新消息记录
      */
     private void updateMessageRecord() {
         if (mConversation == null) {
@@ -111,27 +113,33 @@ public class ChatActivity extends Activity implements View.OnClickListener {
             @Override
             public void done(List<AVIMMessage> list, AVIMException e) {
                 if (e != null) {
+                    ToastUtils.showException(ChatActivity.this);
                     return;
                 }
                 List<MessageInfo> messageList = mChatListAdapter.getMessageList();
                 messageList.clear();
                 for (AVIMMessage message : list) {
-                    if (message instanceof AVIMTextMessage) {
-                        AVIMTextMessage textMessage = (AVIMTextMessage) message;
-                        MessageInfo msg = new MessageInfo();
-                        msg.content = textMessage.getText();
-                        if (message.getFrom().equals(mMyName)) {
-                            msg.type = MessageInfo.TYPE_OUT;
-                        } else {
-                            msg.type = MessageInfo.TYPE_IN;
-                        }
-                        messageList.add(msg);
+                    MessageInfo msg = new MessageInfo();
+                    msg.content = message.getContent();
+                    if (message.getFrom().equals(mMyAccount)) {
+                        msg.type = MessageInfo.TYPE_OUT;
+                    } else {
+                        msg.type = MessageInfo.TYPE_IN;
                     }
+                    messageList.add(msg);
                 }
                 mChatListAdapter.notifyDataSetChanged();
+                scrollToBottom();
 
             }
         });
+    }
+
+    /**
+     * 消息列表滚动到底部
+     */
+    private void scrollToBottom() {
+        mLvChatList.setSelection(mChatListAdapter.getCount() - 1);
     }
 
     @Override
@@ -139,14 +147,15 @@ public class ChatActivity extends Activity implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btn_chat_send:
                 String content = mEtInput.getText().toString().trim();
+                mEtInput.setText("");
                 if (!TextUtils.isEmpty(content)) {
-                    mEtInput.setText("");
                     sendTextMessage(content);
                     MessageInfo msg = new MessageInfo();
                     msg.content = content;
                     msg.type = MessageInfo.TYPE_OUT;
                     mChatListAdapter.getMessageList().add(msg);
                     mChatListAdapter.notifyDataSetChanged();
+                    scrollToBottom();
                 }
 
                 break;
@@ -160,20 +169,60 @@ public class ChatActivity extends Activity implements View.OnClickListener {
      *
      * @param content 消息内容
      */
-    private void sendTextMessage(String content) {
+    private void sendTextMessage(final String content) {
         if (mConversation == null) {
-            Toast.makeText(ChatActivity.this, R.string.chat_send_fail_hint, Toast.LENGTH_SHORT).show();
+            createConversation(new CreateConversationCallBack() {
+                @Override
+                public void onFinish() {
+                    sendTextMessage(content);
+                }
+            });
             return;
         }
-        AVIMTextMessage msg = new AVIMTextMessage();
-        msg.setText(content);
-        msg.setFrom(mMyName);
+        AVIMMessage msg = new AVIMMessage();
+        msg.setContent(content);
+        msg.setFrom(mMyAccount);
         mConversation.sendMessage(msg, new AVIMConversationCallback() {
             @Override
             public void done(AVIMException e) {
+                if (e != null) {
+                    Toast.makeText(ChatActivity.this, R.string.chat_send_fail_hint, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                EventBus.getDefault().post(new MessageEvent());
             }
         });
 
+    }
+
+    private void createConversation(final CreateConversationCallBack callBack) {
+        mMyClient.createConversation(Arrays.asList(mContactsAccount),
+                mMyAccount + "&" + mContactsAccount, null, new AVIMConversationCreatedCallback() {
+                    @Override
+                    public void done(AVIMConversation avimConversation, AVIMException e) {
+                        if (e != null) {
+                            ToastUtils.showException(ChatActivity.this);
+                            return;
+                        }
+                        mConversation = avimConversation;
+                        callBack.onFinish();
+                    }
+                });
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    interface CreateConversationCallBack {
+        void onFinish();
+    }
+
+    public void onEvent(MessageEvent event) {
+        updateMessageRecord();
     }
 
 }

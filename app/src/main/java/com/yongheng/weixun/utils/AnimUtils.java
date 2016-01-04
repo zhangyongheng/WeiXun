@@ -14,8 +14,8 @@ public class AnimUtils {
     /**
      * 开启摇动动画
      *
-     * @param context
-     * @param view
+     * @param context 上下文
+     * @param view 执行该动画的View
      */
     public static void startShakeAnimation(Context context, View view) {
         view.startAnimation(android.view.animation.AnimationUtils.loadAnimation(context, R.anim.shake));

@@ -6,6 +6,8 @@ package com.yongheng.weixun.model;
  */
 public class ContactsInfo implements Comparable<ContactsInfo> {
     public String name;
+    public String account;
+    public String sex;
 
     @Override
     public int compareTo(ContactsInfo another) {

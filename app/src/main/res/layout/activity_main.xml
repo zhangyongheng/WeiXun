@@ -8,9 +8,119 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="30dp"
-        android:paddingLeft="30dp"
+        android:paddingLeft="12dp"
         android:paddingTop="50dp">
 
+        <RelativeLayout
+            android:id="@+id/rl_left_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="12dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/iv_left_ic"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@mipmap/user_male_ic" />
+
+            <TextView
+                android:id="@+id/tv_left_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/iv_left_ic"
+                android:layout_marginLeft="12dp"
+                android:layout_marginTop="12dp"
+                android:layout_toRightOf="@+id/iv_left_ic"
+                android:textColor="@android:color/white"
+                android:textSize="18dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/iv_left_ic"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_toRightOf="@+id/iv_left_ic"
+                android:alpha="0.8"
+                android:text="@string/left_top_disc"
+                android:textColor="@android:color/white"
+                android:textSize="14dp" />
+
+        </RelativeLayout>
+
+
+        <TextView
+            android:id="@+id/tv_left_sign"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rl_left_top"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="12dp"
+            android:alpha="0.8"
+            android:text="@string/left_sign_hint"
+            android:textColor="@android:color/white" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:layout_below="@+id/tv_left_sign"
+            android:layout_marginTop="12dp"
+            android:alpha="0.5"
+            android:background="#F5F5F5" />
+
+        <LinearLayout
+            android:id="@+id/ll_left_setting"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="12dp"
+            android:alpha="0.6"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/left_setting_ic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="@string/left_setup"
+                android:textColor="#FAFAFA"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/ll_left_theme"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_alignBottom="@+id/ll_left_setting"
+            android:layout_toRightOf="@+id/ll_left_setting"
+            android:alpha="0.6"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@mipmap/left_theme_ic" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="@string/left_theme"
+                android:textColor="#FAFAFA"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
     </RelativeLayout>
 
@@ -25,30 +135,30 @@
             android:orientation="vertical">
 
             <RelativeLayout
-                android:id="@+id/rl_main_appbar"
+                android:id="@+id/rl_main_bar"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:background="#607D8B">
+                android:background="@color/app_title_bar">
 
-                <ImageView
-                    android:id="@+id/iv_appbar_ic"
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iv_bar_ic"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="10dp"
-                    android:scaleType="centerCrop"
-                    android:src="@mipmap/ic_launcher" />
+                    android:src="@mipmap/user_male_ic" />
 
                 <TextView
-                    android:id="@+id/tv_appbar_title"
+                    android:id="@+id/tv_bar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:text="@string/app_name"
-                    android:textColor="#ffffff"
+                    android:textColor="@android:color/white"
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/tv_main_add"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -84,13 +194,8 @@
                     android:layout_height="0dp">
 
                 </FrameLayout>
-
-
             </android.support.v4.app.FragmentTabHost>
 
         </LinearLayout>
-
-
     </com.yongheng.weixun.widget.MainFrameLayout>
-
 </com.yongheng.weixun.widget.DragLayout>

@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.yongheng.weixun"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -36,4 +36,5 @@ dependencies {
     compile 'cn.leancloud.android:avoscloud-push:v3.+@aar'
     compile 'cn.leancloud.android:Java-WebSocket:1.3.1-leancloud'
     compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'de.hdodenhof:circleimageview:2.0.0'
 }

@@ -1,11 +1,11 @@
-package com.yongheng.weixun.handler;
+package com.yongheng.weixun;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.AVIMMessageHandler;
-import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
-import com.yongheng.weixun.event.IMTextEvent;
+import com.yongheng.weixun.event.MessageEvent;
+import com.yongheng.weixun.event.MessageNotificationEvent;
 
 import de.greenrobot.event.EventBus;
 
@@ -16,17 +16,16 @@ import de.greenrobot.event.EventBus;
 public class MyMessageHandler extends AVIMMessageHandler {
     @Override
     public void onMessage(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
-        if (message instanceof AVIMTextMessage) {
-            IMTextEvent event = new IMTextEvent();
-            event.message = message;
-            event.conversation = conversation;
-            //EventBus发布一条事件
-            EventBus.getDefault().post(event);
-        }
+        MessageEvent imTextEvent = new MessageEvent();
+        imTextEvent.message = message;
+        imTextEvent.conversation = conversation;
+        EventBus.getDefault().post(imTextEvent);
+        MessageNotificationEvent notificationEvent = new MessageNotificationEvent();
+        notificationEvent.message = message;
+        EventBus.getDefault().post(notificationEvent);
 
     }
 
     public void onMessageReceipt(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
-
     }
 }

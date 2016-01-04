@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="#607D8B">
+        android:background="@color/app_title_bar">
 
         <TextView
             android:id="@+id/tv_chat_title"
@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:textColor="@android:color/white"
-            android:textSize="16dp" />
+            android:textSize="20dp" />
 
     </RelativeLayout>
 
@@ -23,25 +23,40 @@
         android:id="@+id/lv_chat_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_margin="12dp"
+        android:layout_weight="1"
+        android:divider="@null"
+        android:listSelector="@android:color/transparent" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#9E9E9E" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:alpha="0.8"
         android:orientation="horizontal">
 
         <EditText
             android:id="@+id/et_chat_input"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/btn_chat_send"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:textColor="@android:color/black"
-            android:text="发送"/>
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/btn_bg_selector"
+            android:text="@string/chat_send"
+            android:textColor="@android:color/white"
+            android:textSize="14dp" />
 
     </LinearLayout>
 

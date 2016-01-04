@@ -8,21 +8,35 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.DeleteCallback;
 import com.avos.avoscloud.FindCallback;
 import com.yongheng.weixun.Constants;
 import com.yongheng.weixun.R;
 import com.yongheng.weixun.activity.ChatActivity;
+import com.yongheng.weixun.activity.InfoActivity;
 import com.yongheng.weixun.activity.MainActivity;
 import com.yongheng.weixun.adapter.ContactListAdapter;
+import com.yongheng.weixun.event.DeleteContactsEvent;
+import com.yongheng.weixun.event.RemoveConversationEvent;
+import com.yongheng.weixun.event.StartChatEvent;
+import com.yongheng.weixun.event.UpdateContactsListEvent;
+import com.yongheng.weixun.model.AccountInfoBean;
 import com.yongheng.weixun.model.ContactsInfo;
+import com.yongheng.weixun.utils.ToastUtils;
 import com.yongheng.weixun.widget.IndexableListView;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by 张永恒 on 2015/12/22.
@@ -34,6 +48,8 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
 
     private IndexableListView mLvContactList;
     private ContactListAdapter mContactListAdapter;
+    private ProgressBar mProgressBar;
+    private boolean mIsLastContacts;
 
     @Nullable
     @Override
@@ -63,21 +79,54 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
      */
     private void updateContactsList() {
         AVQuery<AVObject> contactsQuery = new AVQuery<>(Constants.TABLE_CONTACTS);
-        contactsQuery.whereEqualTo(Constants.FIELD_CONTACTS_NAME, ((MainActivity) getContext()).getMyName());
+        contactsQuery.whereEqualTo(Constants.FIELD_CONTACTS_NAME, ((MainActivity) getContext()).getMyAccount());
         contactsQuery.findInBackground(new FindCallback<AVObject>() {
             @Override
-            public void done(List<AVObject> list, AVException e) {
+            public void done(final List<AVObject> list, AVException e) {
                 if (e != null) {
+                    ToastUtils.showException(getContext());
                     return;
                 }
-                for (AVObject object : list) {
-                    String contactsName = object.getString(Constants.FIELD_CONTACTS_CONTACTS);
-                    ContactsInfo contactsInfo = new ContactsInfo();
-                    contactsInfo.name = contactsName;
-                    List<ContactsInfo> contactsInfoList = mContactListAdapter.getContactsInfoList();
-                    contactsInfoList.add(contactsInfo);
-                    Collections.sort(contactsInfoList);
+                final List<ContactsInfo> contactsInfoList = mContactListAdapter.getContactsInfoList();
+                mIsLastContacts = false;
+                contactsInfoList.clear();
+                if (list.size() == 0) {
+                    mProgressBar.setVisibility(View.GONE);
                     mContactListAdapter.notifyDataSetChanged();
+                }
+                for (int i = 0; i < list.size(); i++) {
+                    if (i == list.size() - 1) {
+                        mIsLastContacts = true;
+                    }
+                    final ContactsInfo contactsInfo = new ContactsInfo();
+                    contactsInfo.account = list.get(i).getString(Constants.FIELD_CONTACTS_CONTACTS);
+                    contactsInfo.name = contactsInfo.account;
+                    final String[] contactsName = new String[]{contactsInfo.account};
+                    AVQuery<AVObject> accountQuery = new AVQuery<>(Constants.TABLE_ACCOUNT);
+                    accountQuery.whereEqualTo(Constants.FIELD_ACCOUNT_TEL, contactsInfo.account);
+                    accountQuery.findInBackground(new FindCallback<AVObject>() {
+                        @Override
+                        public void done(List<AVObject> list2, AVException e) {
+                            if (e != null) {
+                                return;
+                            }
+                            if (list2.size() > 0) {
+                                contactsName[0] = list2.get(0).getString(Constants.FIELD_ACCOUNT_NAME);
+                                contactsInfo.name = contactsName[0];
+                                String jsonInfo = list2.get(0).getString("info");
+                                AccountInfoBean info = JSON.parseObject(jsonInfo, AccountInfoBean.class);
+                                contactsInfo.sex = info.sex;
+                            }
+                            contactsInfoList.add(contactsInfo);
+
+                            if (mIsLastContacts) {
+                                Collections.sort(contactsInfoList);
+                                mContactListAdapter.notifyDataSetChanged();
+                                mProgressBar.setVisibility(View.GONE);
+                            }
+
+                        }
+                    });
                 }
             }
         });
@@ -88,24 +137,130 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
         mContactListAdapter = new ContactListAdapter(getContext());
         mLvContactList.setAdapter(mContactListAdapter);
         mLvContactList.setOnItemClickListener(this);
-
+        mProgressBar = (ProgressBar) mRootView.findViewById(R.id.pb_contacts_progress);
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
         String contactsName = mContactListAdapter.getContactsInfoList().get(position).name;
-        goToChat(contactsName);
+        String contactsAccount = mContactListAdapter.getContactsInfoList().get(position).account;
+        goToInfo(contactsAccount, contactsName);
     }
 
-    private void goToChat(String contactsName) {
+    private void goToChat(String contactsAccount, String contactsName) {
         Intent intent = new Intent(getContext(), ChatActivity.class);
         ChatActivity.mMyClient = ((MainActivity) getContext()).getMyClient();
-        ;
-        ChatActivity.mMyName = ((MainActivity) getContext()).getMyName();
-        ;
-        ChatActivity.mContactsName = contactsName;
+        intent.putExtra("MyAccount", ((MainActivity) getContext()).getMyAccount());
+        intent.putExtra("ContactsAccount", contactsAccount);
+        intent.putExtra("ContactsName", contactsName);
+
         startActivity(intent);
     }
 
+    private void goToInfo(String contactsAccount, String contactsName) {
+        Intent intent = new Intent(getContext(), InfoActivity.class);
+        intent.putExtra("Account", contactsAccount);
+        intent.putExtra("Name", contactsName);
+        intent.putExtra("From", InfoActivity.FROM_CONTACTS);
+        startActivity(intent);
+    }
 
+    private void deleteContacts(String account) {
+        deleteContactsFromSelf(account);
+        deleteContactsFromOther(account);
+        deleteConversation(account);
+
+    }
+
+    private void deleteContactsFromSelf(String account) {
+        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONTACTS);
+        query.whereEqualTo(Constants.FIELD_CONTACTS_NAME, ((MainActivity) getContext()).getMyAccount());
+        query.whereEqualTo(Constants.FIELD_CONTACTS_CONTACTS, account);
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if (e != null) {
+                    ToastUtils.showException(getContext());
+                    return;
+                }
+                for (AVObject object : list) {
+                    object.deleteInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(AVException e) {
+                            if (e != null) {
+                                Toast.makeText(getContext(), R.string.contacts_delete_fail_hint, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            Toast.makeText(getContext(), R.string.contacts_delete_success_hint, Toast.LENGTH_SHORT).show();
+                            updateContactsList();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void deleteContactsFromOther(String account) {
+        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONTACTS);
+        query.whereEqualTo(Constants.FIELD_CONTACTS_NAME, account);
+        query.whereEqualTo(Constants.FIELD_CONTACTS_CONTACTS,
+                ((MainActivity) getContext()).getMyAccount());
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if (e != null) {
+                    ToastUtils.showException(getContext());
+                    return;
+                }
+                for (AVObject object : list) {
+                    object.deleteInBackground();
+                }
+            }
+        });
+    }
+
+    private void deleteConversation(String account) {
+        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONVERSATION);
+        query.whereContainedIn(Constants.FIELD_CONVERSATION_MEMBER,
+                Arrays.asList(((MainActivity) getContext()).getMyAccount(), account));
+        query.findInBackground(new FindCallback<AVObject>() {
+            @Override
+            public void done(List<AVObject> list, AVException e) {
+                if (e != null) {
+                    ToastUtils.showException(getContext());
+                    return;
+                }
+                for (AVObject object : list) {
+                    object.deleteInBackground();
+                }
+            }
+        });
+        RemoveConversationEvent event = new RemoveConversationEvent();
+        event.account = account;
+        EventBus.getDefault().post(account);
+    }
+
+    public void onEvent(UpdateContactsListEvent event) {
+        updateContactsList();
+    }
+
+    public void onEvent(StartChatEvent event) {
+        goToChat(event.contactsAccount, event.contactsName);
+    }
+
+    public void onEvent(DeleteContactsEvent event) {
+        deleteContacts(event.account);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }

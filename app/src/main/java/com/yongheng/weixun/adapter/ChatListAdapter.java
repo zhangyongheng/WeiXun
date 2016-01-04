@@ -57,13 +57,13 @@ public class ChatListAdapter extends BaseAdapter {
         if (convertView == null) {
             if (getItemViewType(position) == 0) {
                 viewHolder = new ViewHolder();
-                convertView = View.inflate(mContext, R.layout.widget_list_item_chat_out, null);
+                convertView = View.inflate(mContext, R.layout.list_item_chat_to, null);
                 viewHolder.tvContent = (TextView) convertView.findViewById(R.id.tv_chat_message);
                 convertView.setTag(viewHolder);
 
             } else if (getItemViewType(position) == 1) {
                 viewHolder = new ViewHolder();
-                convertView = View.inflate(mContext, R.layout.widget_list_item_chat_in, null);
+                convertView = View.inflate(mContext, R.layout.list_item_chat_from, null);
                 viewHolder.tvContent = (TextView) convertView.findViewById(R.id.tv_chat_message);
                 convertView.setTag(viewHolder);
             }
