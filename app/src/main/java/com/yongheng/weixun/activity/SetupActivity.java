@@ -17,15 +17,19 @@ import com.avos.avoscloud.SaveCallback;
 import com.yongheng.weixun.Constants;
 import com.yongheng.weixun.MyApplication;
 import com.yongheng.weixun.R;
+import com.yongheng.weixun.event.UpdateContactsListEvent;
 import com.yongheng.weixun.model.AccountInfoBean;
+import com.yongheng.weixun.utils.ServerUtils;
 import com.yongheng.weixun.utils.ToastUtils;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by 张永恒 on 2015/12/27.
  * 账号设置界面的Activity
  */
 public class SetupActivity extends Activity
-        implements View.OnClickListener,RadioGroup.OnCheckedChangeListener {
+        implements View.OnClickListener, RadioGroup.OnCheckedChangeListener {
 
     private EditText mEtName;
     private String mAccount;
@@ -101,15 +105,31 @@ public class SetupActivity extends Activity
                     ToastUtils.showException(SetupActivity.this);
                     return;
                 }
+                initContacts();
                 Toast.makeText(SetupActivity.this, R.string.sign_in_success_hint, Toast.LENGTH_SHORT).show();
                 goToMain();
             }
         });
     }
 
+    private void initContacts() {
+        ServerUtils.addContacts(SetupActivity.this, mAccount, Constants.ServiceAccount,
+                new ServerUtils.ServerUtilsCallBack() {
+                    @Override
+                    public void onFinish() {
+                        EventBus.getDefault().post(new UpdateContactsListEvent());
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
+
+    }
+
     private void goToMain() {
-        Intent intent = new Intent(SetupActivity.this, MainActivity.class);
-        intent.putExtra("Account", mAccount);
+        Intent intent = new Intent(SetupActivity.this, MainActivity.class)
+                .putExtra("Account", mAccount);
         startActivity(intent);
 
     }

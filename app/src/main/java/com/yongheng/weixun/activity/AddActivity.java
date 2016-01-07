@@ -7,17 +7,19 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.SaveCallback;
 import com.yongheng.weixun.Constants;
+import com.yongheng.weixun.MyApplication;
 import com.yongheng.weixun.R;
 import com.yongheng.weixun.event.AddContactsEvent;
 import com.yongheng.weixun.event.UpdateContactsListEvent;
+import com.yongheng.weixun.utils.ServerUtils;
 import com.yongheng.weixun.utils.ToastUtils;
 
 import java.util.List;
@@ -38,7 +40,7 @@ public class AddActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         EventBus.getDefault().register(this);
-        mMyAccount = getIntent().getStringExtra("MyAccount");
+        mMyAccount = ((MyApplication) getApplication()).getMyAccount();
         initView();
     }
 
@@ -46,6 +48,8 @@ public class AddActivity extends Activity implements View.OnClickListener {
         mEtAccount = (EditText) findViewById(R.id.et_add_account);
         ImageView ivAdd = (ImageView) findViewById(R.id.iv_add_add);
         ivAdd.setOnClickListener(this);
+        TextView tvReturn = (TextView) findViewById(R.id.tv_add_return);
+        tvReturn.setOnClickListener(this);
 
     }
 
@@ -57,8 +61,10 @@ public class AddActivity extends Activity implements View.OnClickListener {
                 Toast.makeText(AddActivity.this, R.string.add_no_input_hint, Toast.LENGTH_SHORT).show();
                 return;
             }
-            addContacts(account);
-
+            add(account);
+        }
+        if (v.getId() == R.id.tv_add_return) {
+            finish();
         }
     }
 
@@ -67,7 +73,7 @@ public class AddActivity extends Activity implements View.OnClickListener {
      *
      * @param account 要添加的联系人
      */
-    private void addContacts(final String account) {
+    private void add(final String account) {
         AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_ACCOUNT);
         query.whereEqualTo(Constants.FIELD_ACCOUNT_TEL, account);
         if (account.equals(mMyAccount)) {
@@ -94,82 +100,28 @@ public class AddActivity extends Activity implements View.OnClickListener {
     }
 
     private void goToInfo(String account) {
-        Intent intent = new Intent(AddActivity.this, InfoActivity.class);
-        intent.putExtra("Account", account);
-        intent.putExtra("From", InfoActivity.FROM_ADD);
+        Intent intent = new Intent(AddActivity.this, InfoActivity.class)
+                .putExtra("Account", account)
+                .putExtra("From", InfoActivity.FROM_ADD);
         startActivity(intent);
 
     }
 
-    /**
-     * 处理添加联系人操作
-     *
-     * @param account
-     */
-    private void processAdd(final String account) {
-        addContactsFromSelf(account);
-        addContactsFromOther(account);
-    }
-
-    private void addContactsFromSelf(final String account) {
-        final AVObject object = new AVObject(Constants.TABLE_CONTACTS);
-        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONTACTS);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_NAME, mMyAccount);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_CONTACTS, account);
-        query.findInBackground(new FindCallback<AVObject>() {
-            @Override
-            public void done(List<AVObject> list, AVException e) {
-                if (e != null) {
-                    ToastUtils.showException(AddActivity.this);
-                    return;
-                }
-                if (list.size() > 0) {
-                    Toast.makeText(AddActivity.this, R.string.add_allready_exist_hint, Toast.LENGTH_SHORT).show();
-                } else {
-                    object.put(Constants.FIELD_CONTACTS_NAME, mMyAccount);
-                    object.put(Constants.FIELD_CONTACTS_CONTACTS, account);
-                    object.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(AVException e) {
-                            if (e != null) {
-                                ToastUtils.showException(AddActivity.this);
-                                return;
-                            }
-                            Toast.makeText(AddActivity.this, R.string.add_success_hint, Toast.LENGTH_SHORT).show();
-                            EventBus.getDefault().post(new UpdateContactsListEvent());
-                        }
-                    });
-
-                }
-
-            }
-        });
-    }
-
-    private void addContactsFromOther(final String account) {
-        final AVObject object = new AVObject(Constants.TABLE_CONTACTS);
-        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONTACTS);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_NAME, account);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_CONTACTS, mMyAccount);
-        query.findInBackground(new FindCallback<AVObject>() {
-            @Override
-            public void done(List<AVObject> list, AVException e) {
-                if (e != null) {
-                    ToastUtils.showException(AddActivity.this);
-                    return;
-                }
-                if (list.size() == 0) {
-                    object.put(Constants.FIELD_CONTACTS_NAME, account);
-                    object.put(Constants.FIELD_CONTACTS_CONTACTS, mMyAccount);
-                    object.saveInBackground();
-                }
-            }
-        });
-    }
-
 
     public void onEvent(AddContactsEvent event) {
-        processAdd(event.account);
+        ServerUtils.addContacts(AddActivity.this, mMyAccount, event.account,
+                new ServerUtils.ServerUtilsCallBack() {
+                    @Override
+                    public void onFinish() {
+                        Toast.makeText(AddActivity.this, R.string.add_success_hint, Toast.LENGTH_SHORT).show();
+                        EventBus.getDefault().post(new UpdateContactsListEvent());
+                    }
+
+                    @Override
+                    public void onError() {
+                        ToastUtils.showException(AddActivity.this);
+                    }
+                });
     }
 
     @Override

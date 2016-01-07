@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:alpha="0.8"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_menu_item_selector"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_main_menu_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_menu_item_selector"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/menu_main_update"
+            android:textColor="#62A6E7"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#BDBDBD"/>
+
+        <Button
+            android:id="@+id/btn_main_menu_help"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_menu_item_selector"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/menu_main_help"
+            android:textColor="#62A6E7"
+            android:textSize="18sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#BDBDBD"/>
+
+        <Button
+            android:id="@+id/btn_main_menu_exit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_menu_item_selector"
+            android:gravity="center"
+            android:padding="5dp"
+            android:text="@string/menu_main_exit"
+            android:textColor="#f44336"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_main_menu_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/btn_menu_item_selector"
+        android:gravity="center"
+        android:padding="5dp"
+        android:text="取消"
+        android:textColor="#62A6E7"
+        android:textSize="18sp" />
+
+</LinearLayout>

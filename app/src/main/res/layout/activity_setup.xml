@@ -58,7 +58,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="24dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:padding="4dp"
+                android:background="@drawable/et_bg_selector"
+                android:inputType="text"
+                android:maxLength="10"
+                android:singleLine="true" />
 
 
         </LinearLayout>
@@ -143,6 +148,8 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="24dp"
+                android:background="@drawable/et_bg_selector"
+                android:padding="4dp"
                 android:inputType="number"
                 android:maxLength="2"
                 android:singleLine="true" />
@@ -174,8 +181,9 @@
                 android:layout_alignLeft="@+id/tv_setup_sign"
                 android:layout_below="@+id/tv_setup_sign"
                 android:layout_marginRight="12dp"
+                android:inputType="text"
+                android:maxLength="100"
                 android:maxLines="8" />
-
 
         </RelativeLayout>
 

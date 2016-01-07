@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#EEEEEE">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_above="@+id/ll_login_input_container"
         android:layout_centerHorizontal="true"
-        android:src="@mipmap/user_male_ic" />
+        android:src="@mipmap/ic_launcher" />
 
 
     <LinearLayout
@@ -17,21 +18,31 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:background="@android:color/white">
 
         <EditText
             android:id="@+id/et_login_tel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="18dp"
+            android:background="@drawable/et_bg_selector"
             android:hint="@string/login_account_input_hint"
+            android:inputType="number"
+            android:singleLine="true"
+            android:maxLength="11"
             android:padding="12dp" />
 
         <EditText
             android:id="@+id/et_login_pwd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="18dp"
+            android:background="@drawable/et_bg_selector"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:maxLength="18"
             android:hint="@string/login_pwd_input_hint"
             android:padding="12dp" />
 
@@ -41,26 +52,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/ll_login_input_container"
-        android:padding="12dp">
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
-        <Button
+        <TextView
             android:id="@+id/btn_login_login"
-            android:layout_width="100dp"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="40dp"
             android:background="@drawable/btn_login_bg_selector"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:paddingLeft="18dp"
+            android:paddingRight="18dp"
+            android:paddingTop="12dp"
+            android:text="@string/login_login"
             android:textColor="#424242"
-            android:textSize="14sp"
-            android:text="@string/login_login" />
+            android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tv_login_sign"
-            android:layout_width="wrap_content"
+            android:id="@+id/btn_login_sign"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="40dp"
-            android:layout_alignParentRight="true"
             android:background="@drawable/btn_bg_selector"
             android:gravity="center"
             android:paddingBottom="12dp"
@@ -68,8 +87,8 @@
             android:paddingRight="18dp"
             android:paddingTop="12dp"
             android:text="@string/login_sign_in"
-            android:textSize="14sp"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
 
     </RelativeLayout>
 

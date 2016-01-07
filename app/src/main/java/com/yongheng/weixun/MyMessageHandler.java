@@ -16,10 +16,10 @@ import de.greenrobot.event.EventBus;
 public class MyMessageHandler extends AVIMMessageHandler {
     @Override
     public void onMessage(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
-        MessageEvent imTextEvent = new MessageEvent();
-        imTextEvent.message = message;
-        imTextEvent.conversation = conversation;
-        EventBus.getDefault().post(imTextEvent);
+        MessageEvent messageEvent = new MessageEvent();
+        messageEvent.message = message;
+        messageEvent.conversation = conversation;
+        EventBus.getDefault().post(messageEvent);
         MessageNotificationEvent notificationEvent = new MessageNotificationEvent();
         notificationEvent.message = message;
         EventBus.getDefault().post(notificationEvent);

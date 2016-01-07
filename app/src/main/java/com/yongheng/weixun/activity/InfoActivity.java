@@ -6,9 +6,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
@@ -20,9 +21,9 @@ import com.yongheng.weixun.Constants;
 import com.yongheng.weixun.R;
 import com.yongheng.weixun.event.AddContactsEvent;
 import com.yongheng.weixun.event.DeleteContactsEvent;
+import com.yongheng.weixun.event.RemoveConversationEvent;
 import com.yongheng.weixun.event.StartChatEvent;
 import com.yongheng.weixun.model.AccountInfoBean;
-import com.yongheng.weixun.utils.DensityUtils;
 import com.yongheng.weixun.utils.ToastUtils;
 
 import java.util.List;
@@ -192,7 +193,7 @@ public class InfoActivity extends Activity implements View.OnClickListener {
                 finish();
                 break;
             case R.id.tv_info_more:
-                showMorePopup(v);
+                showMoreMenu(v);
                 break;
 
             default:
@@ -201,40 +202,50 @@ public class InfoActivity extends Activity implements View.OnClickListener {
 
     /**
      * 显示“更多”菜单
-     * @param v PopupWindow的父容器
+     *
+     * @param v PopupMenu的父容器
      */
-    private void showMorePopup(View v) {
-        TextView view = (TextView) View.inflate(this, R.layout.widget_popup, null);
-        final PopupWindow popupWindow = new PopupWindow(
-                view, DensityUtils.dip2px(this, 100), DensityUtils.dip2px(this, 40));
-        popupWindow.setFocusable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(null);
-        popupWindow.showAsDropDown(v, 0, DensityUtils.dip2px(this, 8));
-        view.setOnClickListener(new View.OnClickListener() {
+    private void showMoreMenu(View v) {
+        PopupMenu menu = new PopupMenu(InfoActivity.this, v);
+        menu.getMenuInflater().inflate(R.menu.menu_info_more, menu.getMenu());
+        menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                AlertDialog.Builder builder = new AlertDialog.Builder(InfoActivity.this);
-                builder.setMessage(R.string.dialog_delete_contacts_hint)
-                        .setCancelable(false)
-                        .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .setPositiveButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                DeleteContactsEvent delEvent = new DeleteContactsEvent();
-                                delEvent.account = mAccount;
-                                EventBus.getDefault().post(delEvent);
-                                finish();
-                            }
-                        });
-                builder.create().show();
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.menu_del_contacts:
+                        showDelContactsDialog();
+                        break;
+                    default:
+                }
+                return true;
             }
         });
+        menu.show();
+
+    }
+
+    private void showDelContactsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(InfoActivity.this);
+        builder.setMessage(R.string.dialog_delete_contacts_hint)
+                .setCancelable(false)
+                .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .setPositiveButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        DeleteContactsEvent delEvent = new DeleteContactsEvent();
+                        delEvent.account = mAccount;
+                        EventBus.getDefault().post(delEvent);
+                        RemoveConversationEvent remEvent = new RemoveConversationEvent();
+                        remEvent.account = mAccount;
+                        EventBus.getDefault().post(remEvent);
+                        finish();
+                    }
+                });
+        builder.create().show();
     }
 
 }

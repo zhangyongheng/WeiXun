@@ -15,24 +15,22 @@ import com.alibaba.fastjson.JSON;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.DeleteCallback;
 import com.avos.avoscloud.FindCallback;
 import com.yongheng.weixun.Constants;
+import com.yongheng.weixun.MyApplication;
 import com.yongheng.weixun.R;
 import com.yongheng.weixun.activity.ChatActivity;
 import com.yongheng.weixun.activity.InfoActivity;
-import com.yongheng.weixun.activity.MainActivity;
 import com.yongheng.weixun.adapter.ContactListAdapter;
 import com.yongheng.weixun.event.DeleteContactsEvent;
-import com.yongheng.weixun.event.RemoveConversationEvent;
 import com.yongheng.weixun.event.StartChatEvent;
 import com.yongheng.weixun.event.UpdateContactsListEvent;
 import com.yongheng.weixun.model.AccountInfoBean;
 import com.yongheng.weixun.model.ContactsInfo;
+import com.yongheng.weixun.utils.ServerUtils;
 import com.yongheng.weixun.utils.ToastUtils;
 import com.yongheng.weixun.widget.IndexableListView;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -79,7 +77,7 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
      */
     private void updateContactsList() {
         AVQuery<AVObject> contactsQuery = new AVQuery<>(Constants.TABLE_CONTACTS);
-        contactsQuery.whereEqualTo(Constants.FIELD_CONTACTS_NAME, ((MainActivity) getContext()).getMyAccount());
+        contactsQuery.whereEqualTo(Constants.FIELD_CONTACTS_NAME, ((MyApplication) getActivity().getApplication()).getMyAccount());
         contactsQuery.findInBackground(new FindCallback<AVObject>() {
             @Override
             public void done(final List<AVObject> list, AVException e) {
@@ -148,97 +146,59 @@ public class ContactsFragment extends Fragment implements AdapterView.OnItemClic
     }
 
     private void goToChat(String contactsAccount, String contactsName) {
-        Intent intent = new Intent(getContext(), ChatActivity.class);
-        ChatActivity.mMyClient = ((MainActivity) getContext()).getMyClient();
-        intent.putExtra("MyAccount", ((MainActivity) getContext()).getMyAccount());
-        intent.putExtra("ContactsAccount", contactsAccount);
-        intent.putExtra("ContactsName", contactsName);
-
+        Intent intent = new Intent(getContext(), ChatActivity.class)
+                .putExtra("MyAccount", ((MyApplication) getActivity().getApplication()).getMyAccount())
+                .putExtra("ContactsAccount", contactsAccount)
+                .putExtra("ContactsName", contactsName);
         startActivity(intent);
     }
 
     private void goToInfo(String contactsAccount, String contactsName) {
-        Intent intent = new Intent(getContext(), InfoActivity.class);
-        intent.putExtra("Account", contactsAccount);
-        intent.putExtra("Name", contactsName);
-        intent.putExtra("From", InfoActivity.FROM_CONTACTS);
+        Intent intent = new Intent(getContext(), InfoActivity.class)
+                .putExtra("Account", contactsAccount)
+                .putExtra("Name", contactsName)
+                .putExtra("From", InfoActivity.FROM_CONTACTS);
         startActivity(intent);
     }
 
     private void deleteContacts(String account) {
-        deleteContactsFromSelf(account);
-        deleteContactsFromOther(account);
-        deleteConversation(account);
+        ServerUtils.deleteContactsFromSelf(((MyApplication) getActivity().getApplication()).getMyAccount(),
+                account, new ServerUtils.ServerUtilsCallBack() {
+                    @Override
+                    public void onFinish() {
+                        Toast.makeText(getContext(), R.string.contacts_delete_success_hint, Toast.LENGTH_SHORT).show();
+                    }
 
+                    @Override
+                    public void onError() {
+                        Toast.makeText(getContext(), R.string.contacts_delete_fail_hint, Toast.LENGTH_SHORT).show();
+                        updateContactsList();
+                    }
+                });
+
+        ServerUtils.deleteContactsFromOther(((MyApplication) getActivity().getApplication()).getMyAccount(),
+                account, new ServerUtils.ServerUtilsCallBack() {
+                    @Override
+                    public void onFinish() {
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
+
+        ServerUtils.deleteConversation(((MyApplication) getActivity().getApplication()).getMyAccount(),
+                account, new ServerUtils.ServerUtilsCallBack() {
+                    @Override
+                    public void onFinish() {
+                    }
+
+                    @Override
+                    public void onError() {
+                    }
+                });
     }
 
-    private void deleteContactsFromSelf(String account) {
-        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONTACTS);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_NAME, ((MainActivity) getContext()).getMyAccount());
-        query.whereEqualTo(Constants.FIELD_CONTACTS_CONTACTS, account);
-        query.findInBackground(new FindCallback<AVObject>() {
-            @Override
-            public void done(List<AVObject> list, AVException e) {
-                if (e != null) {
-                    ToastUtils.showException(getContext());
-                    return;
-                }
-                for (AVObject object : list) {
-                    object.deleteInBackground(new DeleteCallback() {
-                        @Override
-                        public void done(AVException e) {
-                            if (e != null) {
-                                Toast.makeText(getContext(), R.string.contacts_delete_fail_hint, Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-                            Toast.makeText(getContext(), R.string.contacts_delete_success_hint, Toast.LENGTH_SHORT).show();
-                            updateContactsList();
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    private void deleteContactsFromOther(String account) {
-        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONTACTS);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_NAME, account);
-        query.whereEqualTo(Constants.FIELD_CONTACTS_CONTACTS,
-                ((MainActivity) getContext()).getMyAccount());
-        query.findInBackground(new FindCallback<AVObject>() {
-            @Override
-            public void done(List<AVObject> list, AVException e) {
-                if (e != null) {
-                    ToastUtils.showException(getContext());
-                    return;
-                }
-                for (AVObject object : list) {
-                    object.deleteInBackground();
-                }
-            }
-        });
-    }
-
-    private void deleteConversation(String account) {
-        AVQuery<AVObject> query = new AVQuery<>(Constants.TABLE_CONVERSATION);
-        query.whereContainedIn(Constants.FIELD_CONVERSATION_MEMBER,
-                Arrays.asList(((MainActivity) getContext()).getMyAccount(), account));
-        query.findInBackground(new FindCallback<AVObject>() {
-            @Override
-            public void done(List<AVObject> list, AVException e) {
-                if (e != null) {
-                    ToastUtils.showException(getContext());
-                    return;
-                }
-                for (AVObject object : list) {
-                    object.deleteInBackground();
-                }
-            }
-        });
-        RemoveConversationEvent event = new RemoveConversationEvent();
-        event.account = account;
-        EventBus.getDefault().post(account);
-    }
 
     public void onEvent(UpdateContactsListEvent event) {
         updateContactsList();

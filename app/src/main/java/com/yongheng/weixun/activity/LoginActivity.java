@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,7 +45,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         Intent addShortcutIntent = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
         addShortcutIntent.putExtra("duplicate", false);
         addShortcutIntent.putExtra(
-                Intent.EXTRA_SHORTCUT_NAME,getResources().getString(R.string.app_name));
+                Intent.EXTRA_SHORTCUT_NAME, getResources().getString(R.string.app_name));
         addShortcutIntent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE,
                 Intent.ShortcutIconResource.fromContext(this,
                         R.mipmap.ic_launcher));
@@ -62,8 +61,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private void initView() {
         mEtAccount = (EditText) findViewById(R.id.et_login_tel);
         mEtPassword = (EditText) findViewById(R.id.et_login_pwd);
-        Button btnLogin = (Button) findViewById(R.id.btn_login_login);
-        TextView tvSignIn = (TextView) findViewById(R.id.tv_login_sign);
+        TextView btnLogin = (TextView) findViewById(R.id.btn_login_login);
+        TextView tvSignIn = (TextView) findViewById(R.id.btn_login_sign);
 
         btnLogin.setOnClickListener(this);
         tvSignIn.setOnClickListener(this);
@@ -87,7 +86,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 login(account, pwd);
                 break;
 
-            case R.id.tv_login_sign:
+            case R.id.btn_login_sign:
                 goToSignIn();
                 break;
         }
@@ -120,7 +119,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     }
 
                 } else {
-                    Toast.makeText(LoginActivity.this, R.string.login_signin_hint, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.login_sign_in_hint, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -128,8 +127,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     }
 
     private void goToMain(String account) {
-        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.putExtra("Account", account);
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class)
+                .putExtra("Account", account);
         startActivity(intent);
     }
 

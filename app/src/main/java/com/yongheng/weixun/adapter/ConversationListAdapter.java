@@ -60,6 +60,7 @@ public class ConversationListAdapter extends BaseAdapter {
             viewHold.title = (TextView) convertView.findViewById(R.id.tv_conversation_title);
             viewHold.msg = (TextView) convertView.findViewById(R.id.tv_conversation_msg);
             viewHold.ic = (ImageView) convertView.findViewById(R.id.iv_conversation_ic);
+            viewHold.time = (TextView) convertView.findViewById(R.id.tv_conversation_time);
             convertView.setTag(viewHold);
 
         } else {
@@ -78,6 +79,7 @@ public class ConversationListAdapter extends BaseAdapter {
             default:
                 viewHold.ic.setImageResource(R.mipmap.user_male_ic);
         }
+        viewHold.time.setText(mConversationList.get(position).lastTime);
 
         return convertView;
     }
@@ -86,6 +88,7 @@ public class ConversationListAdapter extends BaseAdapter {
         public ImageView ic;
         public TextView title;
         public TextView msg;
+        public TextView time;
     }
 
 }

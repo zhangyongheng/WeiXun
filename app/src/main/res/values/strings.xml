@@ -2,8 +2,11 @@
 <resources>
 
     <string name="app_name">微讯</string>
-    <string name="btn_title_add">添加</string>
-    <string name="chat_send_fail_hint">发送失败</string>
+    <string name="action_settings">设置</string>
+    <string name="common_back">返回</string>
+    <string name="common_more">更多</string>
+    <string name="common_exception_error">网络连接失败</string>
+    <string name="main_btn_title_add">添加</string>
     <string name="main_login_fail_hint">登录失败</string>
     <string name="main_login_success_hint">登录成功</string>
     <string name="main_offline_hint">已退出登录</string>
@@ -13,16 +16,18 @@
     <string name="login_no_input_account_hint">请输入账号</string>
     <string name="login_no_input_pwd_hint">请输入密码</string>
     <string name="login_pwd_error_hint">密码不正确</string>
-    <string name="login_signin_hint">该用户尚未注册</string>
-    <string name="action_settings">设置</string>
-    <string name="setup_name_hint">您还没有设置昵称</string>
+    <string name="login_sign_in_hint">该用户尚未注册</string>
+    <string name="chat_send_fail_hint">发送失败</string>
+    <string name="chat_send">发送</string>
     <string name="add_no_found_hint">该用户不存在</string>
     <string name="add_no_input_hint">请先输入要添加的账号</string>
     <string name="add_error_hint">添加失败</string>
-    <string name="add_success_hint">添加失败</string>
-    <string name="add_allready_exist_hint">您已经添加了该联系人</string>
-    <string name="common_exception_error">网络连接失败</string>
+    <string name="add_success_hint">添加成功</string>
+    <string name="add_title">添加联系人</string>
+    <string name="add_account_input_hint">手机号</string>
+    <string name="add_already_exist_hint">您已经添加了该联系人</string>
     <string name="add_self_hint">不能添加自己</string>
+    <string name="setup_name_hint">您还没有设置昵称</string>
     <string name="setup_age_hint">您还没有设置年龄</string>
     <string name="setup_sex_hint">您还没有选择性别</string>
     <string name="sign_in_success_hint">注册成功</string>
@@ -38,18 +43,14 @@
     <string name="dialog_cancel">取消</string>
     <string name="dialog_confirm">确定</string>
     <string name="dialog_exit_hint">确定退出吗？</string>
-    <string name="add_title">添加联系人</string>
-    <string name="add_account_input_hint">手机号</string>
-    <string name="chat_send">发送</string>
     <string name="info_title">个人信息</string>
-    <string name="info_back">返回</string>
-    <string name="info_more">更多</string>
     <string name="info_name">昵称</string>
     <string name="info_send">发消息</string>
     <string name="info_add">加为好友</string>
-    <string name="login_account_input_hint">账号</string>
+    <string name="login_account_input_hint">账号/手机号</string>
     <string name="login_pwd_input_hint">密码</string>
     <string name="login_login">登录</string>
+    <string name="login_title">注册</string>
     <string name="login_sign_in">新用户</string>
     <string name="left_top_disc">点击查看个人信息</string>
     <string name="left_sign_hint">编辑个性签名</string>
@@ -63,10 +64,22 @@
     <string name="setup_female">女</string>
     <string name="setup_age">年龄：</string>
     <string name="setup_sign">个性签名：（可选）</string>
-    <string name="signin_account_input_hint">手机号</string>
-    <string name="signin_pwd_input_hint">密码</string>
-    <string name="signin_sign_in">注册</string>
-    <string name="menu_delete_contacts">删除联系人</string>
+    <string name="sign_in_account_input_hint">手机号</string>
+    <string name="sign_in_pwd_input_hint">密码</string>
+    <string name="sign_in_sign_in">注册</string>
     <string name="common_todo">功能待开发</string>
+    <string name="sign_in_confirm_input_hint">确认密码</string>
+    <string name="sign_in_no_input_confirm_hint">请确认密码</string>
+    <string name="sign_in_error_confirm_hint">确认密码与密码不一致</string>
+    <string name="sign_in_no_input_account_hint">请输入手机号</string>
+    <string name="sign_in_no_input_pwd_hint">请设置密码</string>
+    <string name="sign_in_error_input_account_hint">您输入的手机号不正确</string>
+    <string name="menu_info">查看个人资料</string>
+    <string name="menu_clear_msg">清空消息记录</string>
+    <string name="menu_delete_contacts">删除联系人</string>
+    <string name="menu_main_update">版本更新</string>
+    <string name="menu_main_help">帮助与反馈</string>
+    <string name="menu_main_exit">退出微讯</string>
+    <string name="notification_ticker">给你发了一条消息</string>
 
 </resources>

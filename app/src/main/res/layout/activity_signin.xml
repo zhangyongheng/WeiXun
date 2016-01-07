@@ -1,45 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/app_title_bar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/login_title"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tv_sign_in_return"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="12dp"
+            android:text="@string/common_back"
+            android:textColor="#FAFAFA"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/ll_login_input_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="36dp"
+        android:layout_marginRight="36dp"
+        android:layout_marginTop="120dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
 
         <EditText
             android:id="@+id/et_signin_tel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="18dp"
-            android:hint="@string/signin_account_input_hint"
+            android:background="@drawable/et_bg_selector"
+            android:hint="@string/sign_in_account_input_hint"
+            android:inputType="number"
+            android:maxLength="11"
             android:padding="12dp" />
 
         <EditText
             android:id="@+id/et_signin_pwd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="18dp"
-            android:hint="@string/signin_pwd_input_hint"
+            android:background="@drawable/et_bg_selector"
+            android:hint="@string/sign_in_pwd_input_hint"
+            android:inputType="textPassword"
+            android:maxLength="18"
             android:padding="12dp" />
 
-        <Button
-            android:id="@+id/btn_signin_signin"
+        <EditText
+            android:id="@+id/et_signin_confirm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="48dp"
-            android:layout_marginRight="48dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/btn_bg_selector"
-            android:text="@string/signin_sign_in"
-            android:textColor="@android:color/white" />
+            android:background="@drawable/et_bg_selector"
+            android:hint="@string/sign_in_confirm_input_hint"
+            android:inputType="textPassword"
+            android:maxLength="18"
+            android:padding="12dp" />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/btn_signin_signin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/btn_bg_selector"
+        android:text="@string/sign_in_sign_in"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

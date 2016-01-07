@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_chat_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -17,6 +18,27 @@
             android:textColor="@android:color/white"
             android:textSize="20dp" />
 
+        <TextView
+            android:id="@+id/tv_chat_return"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="12dp"
+            android:text="@string/common_back"
+            android:textColor="#FAFAFA"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tv_chat_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="12dp"
+            android:text="@string/common_more"
+            android:textColor="#FAFAFA"
+            android:textSize="16sp" />
+
     </RelativeLayout>
 
     <ListView
@@ -26,6 +48,7 @@
         android:layout_margin="12dp"
         android:layout_weight="1"
         android:divider="@null"
+        android:scrollbars="none"
         android:listSelector="@android:color/transparent" />
 
     <View

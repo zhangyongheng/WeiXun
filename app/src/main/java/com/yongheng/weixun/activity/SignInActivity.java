@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
@@ -27,6 +28,7 @@ public class SignInActivity extends Activity implements View.OnClickListener {
 
     private EditText mEtPwd;
     private EditText mEtTel;
+    private EditText mEtComfirm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,26 +42,45 @@ public class SignInActivity extends Activity implements View.OnClickListener {
     private void initView() {
         mEtTel = (EditText) findViewById(R.id.et_signin_tel);
         mEtPwd = (EditText) findViewById(R.id.et_signin_pwd);
+        mEtComfirm = (EditText) findViewById(R.id.et_signin_confirm);
         Button btnSignIn = (Button) findViewById(R.id.btn_signin_signin);
-
         btnSignIn.setOnClickListener(this);
+        TextView tvReturn = (TextView) findViewById(R.id.tv_sign_in_return);
+        tvReturn.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_signin_signin) {
-            String tel = mEtTel.getText().toString().trim();
+            String tel = mEtTel.getText().toString().trim().replace(" ", "");
             if (TextUtils.isEmpty(tel)) {
-                Toast.makeText(SignInActivity.this, R.string.login_no_input_account_hint, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignInActivity.this, R.string.sign_in_no_input_account_hint, Toast.LENGTH_SHORT).show();
                 return;
             }
-            String pwd = mEtPwd.getText().toString().trim();
+            if (tel.length() != 11) {
+                Toast.makeText(SignInActivity.this, R.string.sign_in_error_input_account_hint, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            String pwd = mEtPwd.getText().toString().trim().replace(" ", "");
             if (TextUtils.isEmpty(pwd)) {
-                Toast.makeText(SignInActivity.this, R.string.login_no_input_pwd_hint, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignInActivity.this, R.string.sign_in_no_input_pwd_hint, Toast.LENGTH_SHORT).show();
                 return;
             }
+            String confirmPwd = mEtComfirm.getText().toString().trim().replace(" ", "");
+            if (TextUtils.isEmpty(confirmPwd)) {
+                Toast.makeText(SignInActivity.this, R.string.sign_in_no_input_confirm_hint, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!confirmPwd.equals(pwd)) {
+                Toast.makeText(SignInActivity.this, R.string.sign_in_error_confirm_hint, Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             signIn(tel, pwd);
+        }
+        if (v.getId() == R.id.tv_sign_in_return) {
+            finish();
         }
     }
 
@@ -84,9 +105,9 @@ public class SignInActivity extends Activity implements View.OnClickListener {
     }
 
     private void goToSetup(String account, String pwd) {
-        Intent intent = new Intent(SignInActivity.this, SetupActivity.class);
-        intent.putExtra("Account", account);
-        intent.putExtra("Pwd", pwd);
+        Intent intent = new Intent(SignInActivity.this, SetupActivity.class)
+                .putExtra("Account", account)
+                .putExtra("Pwd", pwd);
         startActivity(intent);
     }
 

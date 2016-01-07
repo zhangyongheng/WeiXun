@@ -5,8 +5,9 @@ package com.yongheng.weixun.model;
  * 会话的数据模型
  */
 public class ConversationInfo {
-    public String lastMsg;
     public String contactsName;
     public String contactsAccount;
     public String contactsSex;
+    public String lastMsg;
+    public String lastTime;
 }

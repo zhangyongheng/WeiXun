@@ -36,4 +36,6 @@ public class Constants {
     //联系人表的联系人账号字段的字段名
     public static final String FIELD_CONTACTS_CONTACTS = "contacts";
 
+    public static final String ServiceAccount = "00000000000";
+
 }

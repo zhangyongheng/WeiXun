@@ -27,17 +27,20 @@ import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMMessagesQueryCallback;
 import com.yongheng.weixun.Constants;
+import com.yongheng.weixun.MyApplication;
 import com.yongheng.weixun.R;
 import com.yongheng.weixun.activity.ChatActivity;
-import com.yongheng.weixun.activity.MainActivity;
 import com.yongheng.weixun.adapter.ConversationListAdapter;
 import com.yongheng.weixun.event.MessageEvent;
 import com.yongheng.weixun.event.RemoveConversationEvent;
+import com.yongheng.weixun.event.UpdateConversationInfoEvent;
 import com.yongheng.weixun.event.UpdateConversationListEvent;
 import com.yongheng.weixun.model.AccountInfoBean;
 import com.yongheng.weixun.model.ConversationInfo;
+import com.yongheng.weixun.model.MessageContentBean;
 import com.yongheng.weixun.utils.ToastUtils;
 
+import java.sql.Time;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
@@ -55,6 +58,7 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
     private ImageView mScanLine2;
     private FrameLayout mScanLineContainer;
     private boolean mIsLastConversation;
+    private boolean mIsFirst;
 
 
     @Override
@@ -69,6 +73,7 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EventBus.getDefault().register(this);
+        mIsFirst = true;
     }
 
     @Override
@@ -93,7 +98,7 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
             return;
         }
         final List<ConversationInfo> conversationList = mConversationListAdapter.getConversationList();
-        AVIMClient myClient = ((MainActivity) getContext()).getMyClient();
+        AVIMClient myClient = ((MyApplication) getActivity().getApplication()).getMyClient();
         myClient.getQuery().findInBackground(new AVIMConversationQueryCallback() {
             @Override
             public void done(List<AVIMConversation> list, AVIMException e) {
@@ -114,8 +119,8 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
                     final AVIMConversation conversation = list.get(i);
                     final ConversationInfo conversationInfo = new ConversationInfo();
                     //会话的name为“自己的账号名&对方的账号名”,将对方的账号名解析出来
-                    String contactsAccount = conversation.getName()
-                            .replace(((MainActivity) getContext()).getMyAccount(), "")
+                    final String contactsAccount = conversation.getName()
+                            .replace(((MyApplication) getActivity().getApplication()).getMyAccount(), "")
                             .replace("&", "");
                     conversationInfo.contactsAccount = contactsAccount;
                     conversationInfo.contactsName = contactsAccount;
@@ -140,14 +145,26 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
                                 @Override
                                 public void done(List<AVIMMessage> list, AVIMException e) {
                                     if (e != null) {
-                                        ToastUtils.showException(getContext());
                                         return;
                                     }
                                     if (list != null && list.size() != 0) {
-                                        conversationInfo.lastMsg = list.get(0).getContent();
+                                        AVIMMessage message = list.get(0);
+                                        String jsonContent = message.getContent();
+                                        MessageContentBean contentBean = JSON.parseObject(
+                                                jsonContent, MessageContentBean.class);
+                                        conversationInfo.lastMsg = contentBean.c;
+                                        conversationInfo.lastTime = new Time(
+                                                message.getTimestamp()).toString().substring(0, 5);
                                     }
-                                    conversationList.add(conversationInfo);
-
+                                    boolean exist = false;
+                                    for (ConversationInfo info : conversationList) {
+                                        if (!info.contactsAccount.equals(contactsAccount)) {
+                                            exist = true;
+                                        }
+                                    }
+                                    if (!exist) {
+                                        conversationList.add(conversationInfo);
+                                    }
                                     if (mIsLastConversation) {
                                         onUpdateFinish();
                                     }
@@ -163,8 +180,8 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
 
     private void onUpdateFinish() {
         cancelScan();
-        ((MainActivity) getContext()).registerMessageHandler();
         mConversationListAdapter.notifyDataSetChanged();
+        mIsFirst = false;
     }
 
     private void initView() {
@@ -209,11 +226,9 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
     }
 
     private void goToChat(String contactsAccount, String contactsName) {
-        Intent intent = new Intent(getContext(), ChatActivity.class);
-        ChatActivity.mMyClient = ((MainActivity) getContext()).getMyClient();
-        intent.putExtra("MyAccount", ((MainActivity) getContext()).getMyAccount());
-        intent.putExtra("ContactsAccount", contactsAccount);
-        intent.putExtra("ContactsName", contactsName);
+        Intent intent = new Intent(getContext(), ChatActivity.class)
+                .putExtra("ContactsAccount", contactsAccount)
+                .putExtra("ContactsName", contactsName);
         startActivity(intent);
     }
 
@@ -223,7 +238,9 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
      * @param event 文本消息事件
      */
     public void onEvent(MessageEvent event) {
-        updateConversationList();
+        if (!mIsFirst) {
+            updateConversationList();
+        }
     }
 
     public void onEvent(UpdateConversationListEvent event) {
@@ -239,4 +256,20 @@ public class ConversationFragment extends Fragment implements AdapterView.OnItem
         }
         mConversationListAdapter.notifyDataSetChanged();
     }
+
+    public void onEvent(UpdateConversationInfoEvent event) {
+        List<ConversationInfo> conversationInfoList = mConversationListAdapter.getConversationList();
+        boolean exist = false;
+        for (ConversationInfo conversationInfo : conversationInfoList) {
+            if (conversationInfo.contactsAccount.equals(event.account)) {
+                conversationInfo.lastMsg = event.lastMsg;
+                exist = true;
+            }
+        }
+        mConversationListAdapter.notifyDataSetChanged();
+        if (!exist) {
+            updateConversationList();
+        }
+    }
+
 }
